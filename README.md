@@ -10,6 +10,12 @@ First, run the development server: *npm run dev* or *yarn dev*
 
 <br />
 
+<br />
+
+## [Click > Frontend repository](https://github.com/Grekalimbus/TZ-minsk-client) 
+
+<br />  
+
 ### Used tehnolohy
 A plus marked the technologies that I learned while working on the project
 
@@ -18,12 +24,6 @@ A plus marked the technologies that I learned while working on the project
    
     TypeScript
     MongoDB
-
-<br />  
-
-<br />
-
-## [Click > Frontend repository](https://github.com/Grekalimbus/TZ-minsk-client) 
 
 <br />  
 
