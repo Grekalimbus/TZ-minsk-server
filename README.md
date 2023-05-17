@@ -1,73 +1,134 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# **Backend** 
+## Getting Started
+First, run the development server: *npm run dev* or *yarn dev*
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+    npm run dev
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+<br />
+    
+    *yarn dev*
 
-## Description
+<br />
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+### Used tehnolohy
+A plus marked the technologies that I learned while working on the project
 
-## Installation
+    + NestJS    
+    + Docker
+   
+    TypeScript
+    MongoDB
 
-```bash
-$ npm install
+<br />  
+
+## Code examples
+
+<br />  
+
+### Entitie logic
+
+src/user/user.module
+```js
+@Module({
+    providers: [UserService], 
+    controllers: [UsersController], 
+    exports:[UserService],
+    imports: [
+      MongooseModule.forFeature( [{ name: User.name, schema: UserSchema }]), 
+      forwardRef(() => AuthModule),
+    ],        
+   
+  })
+  export class UsersModule {}
 ```
 
-## Running the app
+src/user/user.controller
 
-```bash
-# development
-$ npm run start
+```js
+@Controller('users')
+export class UsersController {
+    constructor (private userService: UserService){}
+    
+    @Post()
+    create(@Body() userDto: CreateUserDto){
+        return this.userService.createUser(userDto)
+    }     
+    
+    @UseGuards(JwtAuthGuard)
+    @Get()
+    getAll(){
+        return this.userService.getAllUsers()
+    }   
+    
+    @UseGuards(JwtAuthGuard)
+    @Get(":email")
+    getOne(@Param('email') email: string){
+        return this.userService.getUsersByEmail(email)
+    }  
 
-# watch mode
-$ npm run start:dev
+    @UseGuards(JwtAuthGuard)
+    @Get('id/:id')
+    getById(@Param('id') id: string) {
+    return this.userService.getById(id);
+    }
+   
+    @UseGuards(JwtAuthGuard)
+    @Get(':id')
+    updateUser(@Param('id') id: string,@Body() userDto: CreateUserDto) {
+    return this.userService.updateUser(id, userDto)
+    }
 
-# production mode
-$ npm run start:prod
+    @UseGuards(JwtAuthGuard)
+    @Patch(':id')
+    update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.userService.update(id, updateUserDto);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Delete(':id')
+    remove(@Param('id') id: string) {
+    return this.userService.remove(id);
+    }
+    
+}
 ```
 
-## Test
+src/user/user.service
+```js
+@Injectable()
+export class UserService {
+    constructor(@InjectModel(User.name) private userModel: Model<UserDocument>){}
 
-```bash
-# unit tests
-$ npm run test
+    async createUser(userDto: CreateUserDto): Promise<UserDocument>{        
+        const createdUser = new this.userModel(userDto);
+        return createdUser.save();
+    }
 
-# e2e tests
-$ npm run test:e2e
+    async getAllUsers(): Promise<UserDocument[]>{
+        return this.userModel.find().exec();
+    }
 
-# test coverage
-$ npm run test:cov
+    async getById(id: string): Promise<UserDocument> {
+        return  this.userModel.findById(id).exec();
+    }
+
+    async getUsersByEmail(email: string): Promise<UserDocument> {
+        const user = await this.userModel.findOne({ email }).exec();
+        return user
+    }   
+    
+    async updateUser(id: string,userDto: CreateUserDto): Promise<UserDocument> {                
+        return this.userModel.findByIdAndUpdate(id, userDto, {new: true}).exec()
+    }
+
+    async update(id: string,updateUserDto: UpdateUserDto): Promise<UserDocument> {                
+        return this.userModel.findByIdAndUpdate(id, updateUserDto, { new: true }).exec();
+    }
+
+    async remove(id: string): Promise<UserDocument> {
+        return this.userModel.findByIdAndDelete(id).exec();
+    }
+   
+}
 ```
 
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
