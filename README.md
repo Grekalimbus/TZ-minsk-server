@@ -2,14 +2,7 @@
 ## Getting Started
 First, run the development server: *npm run dev* or *yarn dev*
 
-    npm run dev
-
-<br />
-    
-    *yarn dev*
-
-<br />
-
+    npm run start:dev
 <br />
 
 ## [Click > Frontend repository](https://github.com/Grekalimbus/TZ-minsk-client) 
@@ -24,16 +17,14 @@ A plus marked the technologies that I learned while working on the project
    
     TypeScript
     MongoDB
-
 <br />  
 
 ## Code examples
-
 <br />  
 
 ### Entitie logic
 
-src/user/user.module
+[src/user/user.module](https://github.com/Grekalimbus/TZ-minsk-server/blob/main/src/user/user.module.ts)
 ```js
 @Module({
     providers: [UserService], 
@@ -47,8 +38,9 @@ src/user/user.module
   })
   export class UsersModule {}
 ```
+<br/>
 
-src/user/user.controller
+[src/user/user.controller](https://github.com/Grekalimbus/TZ-minsk-server/blob/main/src/user/user.controlles.ts)
 
 ```js
 @Controller('users')
@@ -98,8 +90,9 @@ export class UsersController {
     
 }
 ```
+<br />
 
-src/user/user.service
+[src/user/user.service](https://github.com/Grekalimbus/TZ-minsk-server/blob/main/src/user/user.service.ts)
 ```js
 @Injectable()
 export class UserService {
